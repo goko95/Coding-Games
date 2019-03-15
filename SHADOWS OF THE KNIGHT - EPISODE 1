@@ -1,0 +1,232 @@
+03.14.2019
+C#
+
+using System;
+using System.Linq;
+using System.IO;
+using System.Text;
+using System.Collections;
+using System.Collections.Generic;
+
+/**
+ * Auto-generated code below aims at helping you parse
+ * the standard input according to the problem statement.
+ **/
+class Player
+{
+    static void Main(string[] args)
+    {
+        string[] inputs;
+        inputs = Console.ReadLine().Split(' ');
+        int W = int.Parse(inputs[0]); // width of the building.
+        int H = int.Parse(inputs[1]); // height of the building.
+        int N = int.Parse(Console.ReadLine()); // maximum number of turns before game over.
+        inputs = Console.ReadLine().Split(' ');
+        int X0 = int.Parse(inputs[0]);
+        int Y0 = int.Parse(inputs[1]);
+
+        // game loop
+        while (true)
+        {
+            string bombDir = Console.ReadLine(); // the direction of the bombs from batman's current location (U, UR, R, DR, D, DL, L or UL)
+
+            // Write an action using Console.WriteLine()
+            // To debug: Console.Error.WriteLine("Debug messages...");
+
+
+            // the location of the next window Batman should jump to.
+            Console.WriteLine("0 0");
+        }
+    }
+}
+
+
+//My part
+/*
+  So I have tried to do this puzzle for a long time now. However, there were some structures, which I had no idea
+  about how they work and what they do, so I started to search what they have done, but searching them one by one
+  didn't really work. Plus it took so much time that I got bored and pissed, so I have decided to search o YouTube,
+  however that was not very helpful either. So I decided to build the code they have build in a way that I would
+  understand with my knowledge at the moment.
+  
+  Here are some of the videos that I have watched, I hope you'll find them useful:
+  
+  https://www.youtube.com/watch?v=LzUKpADnmNM
+  https://www.youtube.com/watch?v=MCqiWv4KP48
+  https://www.youtube.com/watch?v=uN6XlKbdVAQ
+*/
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Coding_Game_Dot_Com
+{
+    class Shadows_of_the_Knight_Episode_1
+    {
+        public static void Player_Main()
+        {
+            //[row,column]
+            Random kb = new Random();
+            int row = kb.Next(10) + 1;
+            int col = kb.Next(10) + 1;
+            int[,] building = new int[row, col]; //This creates a "2D array" as in my dictionary matrix
+            int bombCol = kb.Next(9); //This sets Column value for the Bomb
+            int bombRow = kb.Next(9); //This sets Row value for the Bomb
+            int batmanCol = kb.Next(9); //This sets Column value for Batman
+            int batmanRow = kb.Next(9); //This sets Row value for the Batman
+
+            //(batmanCol > col || batmanRow > row) || (bombCol == batmanCol && bombRow == batmanRow) || (bombCol > col || bombRow > row)
+
+            while (true) //This is to make sure everything is set up correctly
+            {
+                while (batmanCol > col || batmanRow > row) //This is to prevent "Out of Range" exception
+                    if (batmanRow > row)
+                        batmanRow = kb.Next(9);
+                    else if (batmanCol > col)
+                        batmanCol = kb.Next(9);
+
+                while (bombCol > col || bombRow > row) //This is to prevent "Out of Range" exception
+                    if (bombRow > row)
+                        bombRow = kb.Next(9);
+                    else if (bombCol > col)
+                        bombCol = kb.Next(9);
+
+                while (bombCol == batmanCol && bombRow == batmanRow) //This is to prevent an automatic win
+                {
+                    if (bombCol == batmanCol)
+                    {
+                        bombCol = kb.Next(9);
+                        batmanCol = kb.Next(9);
+                    }
+                    else if (bombRow == batmanRow)
+                    {
+                        bombRow = kb.Next(9);
+                        batmanRow = kb.Next(9);
+                    }
+                }
+
+                if (batmanCol <= col && batmanRow <= row)
+                    if (bombCol <= col && bombRow <= row)
+                        if (batmanCol != bombCol && batmanRow != bombRow)
+                            break;
+            }
+
+            for (int i = 0; i < row; i++) //This is to assign values to the matrix
+                for (int k = 0; k < col; k++)
+                    building[i, k] = 0; //"0" indicates the windows
+
+            building[bombRow, bombCol] = 9; //"9" indicates the bomb
+            building[batmanRow, batmanCol] = 1; //"1" indicates Batman because he is #1
+
+            while (true) //Allows the Player to play
+            {
+                for (int i = 0; i < row; i++) //Writes the matrix to the console
+                {
+                    for (int k = 0; k < col; k++)
+                        Console.Write(building[i, k]);
+
+                    Console.WriteLine();
+                }
+                Console.Read();
+
+                return;
+            }
+        }
+    }
+}
+
+
+/*
+  So this is what I have got so far. Even this version has a lot of changes on them and I'll try to explain them:
+    1. In the fist time I started the code these codes were not like this
+    
+            //(batmanCol > col || batmanRow > row) || (bombCol == batmanCol && bombRow == batmanRow) || (bombCol > col || bombRow > row)
+
+            while (true) //This is to make sure everything is set up correctly
+            {
+                while (batmanCol > col || batmanRow > row) //This is to prevent "Out of Range" exception
+                    if (batmanRow > row)
+                        batmanRow = kb.Next(9);
+                    else if (batmanCol > col)
+                        batmanCol = kb.Next(9);
+
+                while (bombCol > col || bombRow > row) //This is to prevent "Out of Range" exception
+                    if (bombRow > row)
+                        bombRow = kb.Next(9);
+                    else if (bombCol > col)
+                        bombCol = kb.Next(9);
+
+                while (bombCol == batmanCol && bombRow == batmanRow) //This is to prevent an automatic win
+                {
+                    if (bombCol == batmanCol)
+                    {
+                        bombCol = kb.Next(9);
+                        batmanCol = kb.Next(9);
+                    }
+                    else if (bombRow == batmanRow)
+                    {
+                        bombRow = kb.Next(9);
+                        batmanRow = kb.Next(9);
+                    }
+                }
+
+                if (batmanCol <= col && batmanRow <= row)
+                    if (bombCol <= col && bombRow <= row)
+                        if (batmanCol != bombCol && batmanRow != bombRow)
+                            break;
+            }
+            
+    It was like this instead:
+       
+                while (bombCol == batmanCol && bombRow == batmanRow) //This is to prevent an automatic win
+                {
+                    if (bombCol == batmanCol)
+                    {
+                        bombCol = kb.Next(9);
+                        batmanCol = kb.Next(9);
+                    }
+                    else if (bombRow == batmanRow)
+                    {
+                        bombRow = kb.Next(9);
+                        batmanRow = kb.Next(9);
+                    }
+                }
+                
+     At first I was able to anticipate that there might be a chance for the player to win automaticly, so I wrote this code, however
+     I was not able to anticipate the fact that there is a chance of "...Out of Range..." exception. So I wrote the code above and this
+     time I anticipated something cool, and that is the chance of an another exception caused by one of the "while"s.
+     
+     2. while (true) //This is to make sure everything is set up correctly
+            {
+            ...
+            if (batmanCol <= col && batmanRow <= row)
+                    if (bombCol <= col && bombRow <= row)
+                        if (batmanCol != bombCol && batmanRow != bombRow)
+                            break;
+            }
+            
+            This line was not written like this originally. It was written like this
+            
+            while((batmanCol > col || batmanRow > row) || (bombCol == batmanCol && bombRow == batmanRow) || (bombCol > col || bombRow > row)) //This is to make sure everything is set up correctly
+            {
+            ...
+            }
+            
+            So the problem with this line was that there were too many comparison operators. The problem is caused by the short circuit
+            property. The code actually worked the first time, however I was suspicious that it might not work twice, so that is the reason
+            why I have written it the way I wrote it at the top. However, even this version does not work right all the time.
+            
+    So I haven't written the play mechanics yet. I think can do that easily, however I also want to teach how to write code, so I have decided
+    to show you guys the steps. There was already 3 versions of my code up until now, so I wanted to break it down. I will be working on the
+    rest of the code, and I will branch it into new one. However, I either do not know how to fix this problem yet, or I haven't figured out
+    how to fix it. I could enter a fixed value for the number of row and column of the "building" matrix, but that would be cheating in my
+    opinion, so I'll think for a while about how to fix that problem, but it that won't happen until I am done with the play mechanics.
+    
+    I hope you find this useful.
+    
+    Thanks,
+    Gökalp Ergenekon
+*/

@@ -42,6 +42,7 @@ class Player
 
 
 //My part
+
 /*
   So I have tried to do this puzzle for a long time now. However, there were some structures, which I had no idea
   about how they work and what they do, so I started to search what they have done, but searching them one by one
@@ -229,4 +230,624 @@ namespace Coding_Game_Dot_Com
     
     Thanks,
     Gökalp Ergenekon
+*/
+
+!!!Version 2!!!
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Coding_Game_Dot_Com
+{
+    class Shadows_of_the_Knight_Episode_1
+    {
+        public static void Player_Main()
+        {
+            //[row,column]
+            Random kb = new Random();
+            int row = kb.Next(10) + 1;
+            int col = kb.Next(10) + 1;
+            int timeTried = (row + col) * 2;
+            int[,] building = new int[row, col]; //This creates a "2D array" as in my dictionary matrix
+            int bombCol = kb.Next(9); //This sets Column value for the Bomb
+            int bombRow = kb.Next(9); //This sets Row value for the Bomb
+            int batmanCol = kb.Next(9); //This sets Column value for Batman
+            int batmanRow = kb.Next(9); //This sets Row value for the Batman
+
+            //(batmanCol > col || batmanRow > row) || (bombCol == batmanCol && bombRow == batmanRow) || (bombCol > col || bombRow > row)
+
+            while (true) //This is to make sure everything is set up correctly
+            {
+                while (batmanCol > col || batmanRow > row) //This is to prevent "Out of Range" exception
+                    if (batmanRow > row)
+                        batmanRow = kb.Next(9);
+                    else if (batmanCol > col)
+                        batmanCol = kb.Next(9);
+
+                while (bombCol > col || bombRow > row) //This is to prevent "Out of Range" exception
+                    if (bombRow > row)
+                        bombRow = kb.Next(9);
+                    else if (bombCol > col)
+                        bombCol = kb.Next(9);
+
+                while (bombCol == batmanCol && bombRow == batmanRow) //This is to prevent an automatic win
+                {
+                    if (bombCol == batmanCol)
+                    {
+                        bombCol = kb.Next(9);
+                        batmanCol = kb.Next(9);
+                    }
+                    else if (bombRow == batmanRow)
+                    {
+                        bombRow = kb.Next(9);
+                        batmanRow = kb.Next(9);
+                    }
+                }
+
+                if (batmanCol <= col && batmanRow <= row)
+                    if (bombCol <= col && bombRow <= row)
+                        if (batmanCol != bombCol && batmanRow != bombRow)
+                            //break;
+                            goto outLoop;
+            }
+            
+            outLoop:
+
+            while (true) //Allows the Player to play
+            {
+                for (int i = 0; i < row; i++) //This is to assign values to the matrix
+                    for (int k = 0; k < col; k++)
+                        building[i, k] = 0; //"0" indicates the windows
+
+                building[bombRow, bombCol] = 9; //"9" indicates the bomb
+                building[batmanRow, batmanCol] = 1; //"1" indicates Batman because he is #1
+
+                Console.WriteLine("You can try " + timeTried + " times.");
+                timeTried--; //Lowers down the value of "timeTried" by one
+
+                for (int i = 0; i < row; i++) //Writes the matrix to the console
+                {
+                    for (int k = 0; k < col; k++)
+                        Console.Write(building[i, k]);
+
+                    Console.WriteLine();
+                }
+
+                Console.WriteLine("Please enter a value for row./n(It starts from 0)");
+                batmanRow = Convert.ToInt32(Console.ReadLine());
+
+                Console.WriteLine("Please enter a value for column./n(It starts from 0)");
+                batmanCol = Convert.ToInt32(Console.ReadLine());
+
+                //What if I don't want this code to run the first time but run later on?
+                if (batmanRow > bombRow && batmanCol > bombCol) //Guides the player about the location of the bomb
+                    Console.WriteLine("Up-Left");
+                else if (batmanRow > bombRow && batmanCol < bombCol)
+                    Console.WriteLine("Up-Right");
+                else if (batmanRow < bombRow && batmanCol < bombCol)
+                    Console.WriteLine("Down-Right");
+                else if (batmanRow < bombRow && batmanCol > bombCol)
+                    Console.WriteLine("Down-Left");
+                else if (batmanRow > bombRow)
+                    Console.WriteLine("Up");
+                else if (batmanRow < bombRow)
+                    Console.WriteLine("Down");
+                else if (batmanCol > bombCol)
+                    Console.WriteLine("Left");
+                else if (batmanCol < bombCol)
+                    Console.WriteLine("Right");
+
+                if (batmanRow == bombRow && batmanCol == bombCol) //Win & lose conditions
+                {
+                    Console.WriteLine("You win!");
+                    Console.ReadKey();
+                    return;
+                }
+                else if (timeTried == 0)
+                {
+                    Console.WriteLine("You lose!");
+                    Console.ReadKey();
+                    return;
+                }
+            }
+        }
+    }
+}
+
+/*
+    So I couldn' t trust GitHub so I put my work below my first. This code is kind of broken, because this code works the same, 
+    I am not really sure of that statement, but gives different results. In one scenario it throws exception, second it gets 
+    stuck in "while" (which I think I have solved that one), and finally it works. So lets start with what has chaged.
+    1.  
+        while (true) //This is to make sure everything is set up correctly
+        {
+        ...
+    
+                if (batmanCol <= col && batmanRow <= row)
+                        if (bombCol <= col && bombRow <= row)
+                            if (batmanCol != bombCol && batmanRow != bombRow)
+                                //break;
+                                goto outLoop;
+        }
+            
+        outLoop:
+
+        In the early version there was a "break" as you can see. Well I learned that "break" doesn't really work like that. So that is
+        why it was stuck in "while", because it never gets the chance to get out of the loop. So I cheated a little and used "goto" 
+        keyword to get out of the loop.
+    2.
+        for (int i = 0; i < row; i++) //This is to assign values to the matrix
+                        for (int k = 0; k < col; k++)
+                            building[i, k] = 0; //"0" indicates the windows
+
+                    building[bombRow, bombCol] = 9; //"9" indicates the bomb
+                    building[batmanRow, batmanCol] = 1; //"1" indicates Batman because he is #1
+    
+        This code's location has changed. I took it into the "while", because everytime we enter a value we want to set the new value and
+        delete the old one. By placing this piece of code we can do that.
+    
+    So obviously this code could have been writen way better than I can, but within my knowledge this is what I have got so far. I wish
+    I could do better, but I really believe this is the best I have got so far. I have tried to take you through the each step I have taken.
+    
+    I hope you find this useful.
+    
+    Thanks.
+    Gökalp Ergenekon
+*/
+
+!!!03.16.2019!!!
+!!!Version 2.1!!!
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Coding_Game_Dot_Com
+{
+    class Shadows_of_the_Knight_Episode_1
+    {
+        public static void Player_Main()
+        {
+            //[row,column]
+            Random kb = new Random();
+            int row = kb.Next(10) + 1;
+            int col = kb.Next(10) + 1;
+            int timeTried = (row + col) * 2;
+            int[,] building = new int[row, col]; //This creates a "2D array" as in my dictionary matrix
+            int bombCol = kb.Next(9); //This sets Column value for the Bomb
+            int bombRow = kb.Next(9); //This sets Row value for the Bomb
+            int batmanCol = kb.Next(9); //This sets Column value for Batman
+            int batmanRow = kb.Next(9); //This sets Row value for the Batman
+
+            //(batmanCol > col || batmanRow > row) || (bombCol == batmanCol && bombRow == batmanRow) || (bombCol > col || bombRow > row)
+
+            while (true) //This is to make sure everything is set up correctly
+            {
+                while (batmanCol > col || batmanRow > row) //This is to prevent "Out of Range" exception
+                    if (batmanRow > row)
+                        row = row + batmanRow;
+                    else if (batmanCol > col)
+                        col = col + batmanCol;
+
+                while (bombCol > col || bombRow > row) //This is to prevent "Out of Range" exception
+                    if (bombRow > row)
+                        row = row + bombRow;
+                    else if (bombCol > col)
+                        col = col + bombCol;
+
+                while (bombCol == batmanCol && bombRow == batmanRow) //This is to prevent an automatic win
+                {
+                    if (bombCol == batmanCol)
+                    {
+                        bombCol = kb.Next(9);
+                        batmanCol = kb.Next(9);
+                    }
+                    else if (bombRow == batmanRow)
+                    {
+                        bombRow = kb.Next(9);
+                        batmanRow = kb.Next(9);
+                    }
+                }
+
+                if (batmanCol <= col && batmanRow <= row)
+                    if (bombCol <= col && bombRow <= row)
+                        if (batmanCol != bombCol && batmanRow != bombRow)
+                            //break;
+                            goto outLoop;
+            }
+            
+            outLoop:
+
+            building[bombRow, bombCol] = 9; //"9" indicates the bomb
+
+            while (true) //Allows the Player to play
+            {
+                for (int i = 0; i < row; i++) //This is to assign values to the matrix
+                    for (int k = 0; k < col; k++)
+                        building[i, k] = 0; //"0" indicates the windows
+
+                building[batmanRow, batmanCol] = 1; //"1" indicates Batman because he is #1
+
+                Console.WriteLine("You can try " + timeTried + " times.");
+                timeTried--; //Lowers down the value of "timeTried" by one
+
+                for (int i = 0; i < row; i++) //Writes the matrix to the console
+                {
+                    for (int k = 0; k < col; k++)
+                        Console.Write(building[i, k]);
+
+                    Console.WriteLine();
+                }
+
+                Console.WriteLine("Please enter a value for row. /n (It starts from 0)");
+                batmanRow = Convert.ToInt32(Console.ReadLine());
+
+                Console.WriteLine("Please enter a value for column. /n (It starts from 0)");
+                batmanCol = Convert.ToInt32(Console.ReadLine());
+
+                //What if I don't want this code to run the first time but run later on?
+                if (batmanRow > bombRow && batmanCol > bombCol) //Guides the player about the location of the bomb
+                    Console.WriteLine("Up-Left");
+                else if (batmanRow > bombRow && batmanCol < bombCol)
+                    Console.WriteLine("Up-Right");
+                else if (batmanRow < bombRow && batmanCol < bombCol)
+                    Console.WriteLine("Down-Right");
+                else if (batmanRow < bombRow && batmanCol > bombCol)
+                    Console.WriteLine("Down-Left");
+                else if (batmanRow > bombRow)
+                    Console.WriteLine("Up");
+                else if (batmanRow < bombRow)
+                    Console.WriteLine("Down");
+                else if (batmanCol > bombCol)
+                    Console.WriteLine("Left");
+                else if (batmanCol < bombCol)
+                    Console.WriteLine("Right");
+
+                if (batmanRow == bombRow && batmanCol == bombCol) //Win & lose conditions
+                {
+                    Console.WriteLine("You win!");
+                    Console.ReadKey();
+                    return;
+                }
+                else if (timeTried == 0)
+                {
+                    Console.WriteLine("You lose!");
+                    Console.ReadKey();
+                    return;
+                }
+            }
+        }
+    }
+}
+
+/*
+    There are very small changes, I'll walk you through
+    1. 
+         while (true) //This is to make sure everything is set up correctly
+            {
+                while (batmanCol > col || batmanRow > row) //This is to prevent "Out of Range" exception
+                    if (batmanRow > row)
+                        batmanRow = kb.Next(9);
+                    else if (batmanCol > col)
+                        batmanCol = kb.Next(9);
+
+                while (bombCol > col || bombRow > row) //This is to prevent "Out of Range" exception
+                    if (bombRow > row)
+                        bombRow = kb.Next(9);
+                    else if (bombCol > col)
+                        bombCol = kb.Next(9);
+                
+                ...
+           }
+           
+         These lines have changed into this:
+         
+         while (true) //This is to make sure everything is set up correctly
+            {
+                while (batmanCol > col || batmanRow > row) //This is to prevent "Out of Range" exception
+                    if (batmanRow > row)
+                        row = row + batmanRow;
+                    else if (batmanCol > col)
+                        col = col + batmanCol;
+
+                while (bombCol > col || bombRow > row) //This is to prevent "Out of Range" exception
+                    if (bombRow > row)
+                        row = row + bombRow;
+                    else if (bombCol > col)
+                        col = col + bombCol;
+                
+                ...
+            }
+            
+        I have changed "random" into simple map to ensure that the result is correct all the time. However,
+        this didn't solve the problem. I still get "...Out of Range" exception.
+    
+    2.
+        outLoop:
+    
+        building[bombRow, bombCol] = 9; //"9" indicates the bomb
+        
+        while (true)
+        {
+        ...
+        }
+        
+        I have chaged the location of "building", because it is more optimized this way. Before it was 
+        assigning the same value over and over again.
+        
+         while (true) //Allows the Player to play
+            {
+                ...
+
+                building[bombRow, bombCol] = 9; //"9" indicates the bomb
+                building[batmanRow, batmanCol] = 1; //"1" indicates Batman because he is #1
+        
+                ...
+            }
+            
+!!!03.17.2019!!!
+!!!Version 2.2!!!
+            
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Coding_Game_Dot_Com
+{
+    class Shadows_of_the_Knight_Episode_1
+    {
+        public static void Player_Main()
+        {
+            //[row,column]
+            Random kb = new Random();
+            int row = kb.Next(10) + 1;
+            int col = kb.Next(10) + 1;
+            int timeTried = (row + col) * 2;
+            int[,] building = new int[row, col]; //This creates a "2D array" as in my dictionary matrix
+            int bombCol = kb.Next(9); //This sets Column value for the Bomb
+            int bombRow = kb.Next(9); //This sets Row value for the Bomb
+            int batmanCol = kb.Next(9); //This sets Column value for Batman
+            int batmanRow = kb.Next(9); //This sets Row value for the Batman
+
+            //(batmanCol > col || batmanRow > row) || (bombCol == batmanCol && bombRow == batmanRow) || (bombCol > col || bombRow > row)
+
+            while (true) //This is to make sure everything is set up correctly
+            {
+                while (batmanCol >= col || batmanRow >= row) //This is to prevent "Out of Range" exception
+                    if (batmanRow >= row)
+                        batmanRow = kb.Next(9);
+                    else if (batmanCol >= col)
+                        batmanCol = kb.Next(9);
+
+                while (bombCol >= col || bombRow >= row) //This is to prevent "Out of Range" exception
+                    if (bombRow >= row)
+                        bombRow = kb.Next(9);
+                    else if (bombCol >= col)
+                        bombCol = kb.Next(9);
+
+                while (bombCol == batmanCol && bombRow == batmanRow) //This is to prevent an automatic win
+                {
+                    if (bombCol == batmanCol)
+                    {
+                        bombCol = kb.Next(9);
+                        batmanCol = kb.Next(9);
+                    }
+                    else if (bombRow == batmanRow)
+                    {
+                        bombRow = kb.Next(9);
+                        batmanRow = kb.Next(9);
+                    }
+                }
+
+                if (batmanCol < col && batmanRow < row)
+                    if (bombCol < col && bombRow < row)
+                        if (batmanCol != bombCol || batmanRow != bombRow)
+                            break;
+            }
+
+            while (true) //Allows the Player to play
+            {
+                for (int i = 0; i < row; i++) //This is to assign values to the matrix
+                    for (int k = 0; k < col; k++)
+                        building[i, k] = 0; //"0" indicates the windows
+
+                building[bombRow, bombCol] = 9; //"9" indicates the bomb
+                building[batmanRow, batmanCol] = 1; //"1" indicates Batman because he is #1
+
+                Console.WriteLine("You can try " + timeTried + " times.");
+                timeTried--; //Lowers down the value of "timeTried" by one
+
+                for (int i = 0; i < row; i++) //Writes the matrix to the console
+                {
+                    for (int k = 0; k < col; k++)
+                        Console.Write(building[i, k]);
+
+                    Console.WriteLine();
+                }
+
+                Console.WriteLine("Please enter a value for row. %n (It starts from 0)");
+                batmanRow = Convert.ToInt32(Console.ReadLine());
+
+                Console.WriteLine("Please enter a value for column. %n (It starts from 0)");
+                batmanCol = Convert.ToInt32(Console.ReadLine());
+
+                //What if I don't want this code to run the first time but run later on?
+                if (batmanRow > bombRow && batmanCol > bombCol) //Guides the player about the location of the bomb
+                    Console.WriteLine("Up-Left");
+                else if (batmanRow > bombRow && batmanCol < bombCol)
+                    Console.WriteLine("Up-Right");
+                else if (batmanRow < bombRow && batmanCol < bombCol)
+                    Console.WriteLine("Down-Right");
+                else if (batmanRow < bombRow && batmanCol > bombCol)
+                    Console.WriteLine("Down-Left");
+                else if (batmanRow > bombRow)
+                    Console.WriteLine("Up");
+                else if (batmanRow < bombRow)
+                    Console.WriteLine("Down");
+                else if (batmanCol > bombCol)
+                    Console.WriteLine("Left");
+                else if (batmanCol < bombCol)
+                    Console.WriteLine("Right");
+
+                if (batmanRow == bombRow && batmanCol == bombCol) //Win & lose conditions
+                {
+                    Console.WriteLine("You win!");
+                    Console.ReadKey();
+                    return;
+                }
+                else if (timeTried == 0)
+                {
+                    Console.WriteLine("You lose!");
+                    Console.ReadKey();
+                    return;
+                }
+            }
+        }
+    }
+}
+
+/*
+    So guys this is the final version of this game. I have solved the problem and I'm going to walk you through the steps, one by one.
+    1.
+        while (true) //This is to make sure everything is set up correctly
+            {
+                while (batmanCol > col || batmanRow > row) //This is to prevent "Out of Range" exception
+                    if (batmanRow > row)
+                        row = row + batmanRow;
+                    else if (batmanCol > col)
+                        col = col + batmanCol;
+
+                while (bombCol > col || bombRow > row) //This is to prevent "Out of Range" exception
+                    if (bombRow > row)
+                        row = row + bombRow;
+                    else if (bombCol > col)
+                        col = col + bombCol;
+
+                while (bombCol == batmanCol && bombRow == batmanRow) //This is to prevent an automatic win
+                {
+                    if (bombCol == batmanCol)
+                    {
+                        bombCol = kb.Next(9);
+                        batmanCol = kb.Next(9);
+                    }
+                    else if (bombRow == batmanRow)
+                    {
+                        bombRow = kb.Next(9);
+                        batmanRow = kb.Next(9);
+                    }
+                }
+
+                if (batmanCol <= col && batmanRow <= row)
+                    if (bombCol <= col && bombRow <= row)
+                        if (batmanCol != bombCol && batmanRow != bombRow)
+                            //break;
+                            goto outLoop;
+            }
+            
+            outLoop:
+            
+            These line have changed into this:
+            
+            while (true) //This is to make sure everything is set up correctly
+            {
+                while (batmanCol >= col || batmanRow >= row) //This is to prevent "Out of Range" exception
+                    if (batmanRow >= row)
+                        batmanRow = kb.Next(9);
+                    else if (batmanCol >= col)
+                        batmanCol = kb.Next(9);
+
+                while (bombCol >= col || bombRow >= row) //This is to prevent "Out of Range" exception
+                    if (bombRow >= row)
+                        bombRow = kb.Next(9);
+                    else if (bombCol >= col)
+                        bombCol = kb.Next(9);
+
+                while (bombCol == batmanCol && bombRow == batmanRow) //This is to prevent an automatic win
+                {
+                    if (bombCol == batmanCol)
+                    {
+                        bombCol = kb.Next(9);
+                        batmanCol = kb.Next(9);
+                    }
+                    else if (bombRow == batmanRow)
+                    {
+                        bombRow = kb.Next(9);
+                        batmanRow = kb.Next(9);
+                    }
+                }
+
+                if (batmanCol < col && batmanRow < row)
+                    if (bombCol < col && bombRow < row)
+                        if (batmanCol != bombCol || batmanRow != bombRow)
+                            break;
+            }
+
+            I understand that it is hard to see the differences, but like they said the Devil hides in details. So I have had two
+            problems that I mentioned earlier, right? One of them was the "...Out of Range" exception and the other was that there 
+            was no action. So no action in this scenario means that the program is stuck in the first infinite loop, so the reason 
+            behind this is the wrong use of operators.
+            
+            If you take a look at the operator that are inside the "if" conditions you'll see that the operators have changed.
+            
+            Version 2.1
+            while (batmanCol > col || batmanRow > row)
+            Version 2.2
+            while (batmanCol >= col || batmanRow >= row)
+            
+            I have made this change, because the first one has a bug. When you are creating an array the maximum value of the array IS
+            NOT the value you assigned, because arrays' index numbers ALWAYS start from 0, and the maximum index number is ALWAYS the
+            number you have assigned minus 1. So the first code will not work when the values are equal. For example in a case, where 
+            "batmanCol == col" this line will NOT catch that and it will cause an "...Out of Range" exception. This code also leads us
+            to our second problem, getting stuck in while. Let take a look at these lines.
+            
+            Version 2.1
+            if (batmanCol <= col && batmanRow <= row)
+                    if (bombCol <= col && bombRow <= row)
+                        if (batmanCol != bombCol && batmanRow != bombRow)
+                            //break;
+                            goto outLoop;
+            }
+            
+            outLoop:
+            Version 2.2
+            if (batmanCol < col && batmanRow < row)
+                    if (bombCol < col && bombRow < row)
+                        if (batmanCol != bombCol || batmanRow != bombRow)
+                            break;
+
+            So here we got a huge problem if all the values are the same, because we'll get an "...Out of Range" exception. So, this part
+            was the part where I changed first, however this lead me to another problem and that is getting stuck in the loop. Because this
+            code's Version 2.2 doesn't allow equal values to "break" the loop, and because I had "if"s that don't change the equal values I
+            was stuck inside the loop. Also, if you take a close look, you'll see that I have also changed "&&" to "||", because the only case
+            that I don't want is the case where both of those are equal. So at this point the Version 2.2 doesn't have any bugs that I could 
+            find, however this is not a good technique of how to write code, because the lenght of the "method/function" is too devistating. It
+            would be better to break things into smaller "method/function"s.
+            
+            Also if you have realized, you'll see that I have also changed "goto" to "break", and the reason is that "goto" is more often used
+            to get out of loop which is in a loop, but "break" is used to get out of one loop.
+            For example:
+                while (true)
+                {
+                    ...
+                    while (true)
+                    {
+                        ...
+                        if (...)
+                            goto outLoop;
+                    }
+                }
+                outLoop:
+                Because in our case we are only inside one layer of loop, it is more approprirate to use "break".
+                
+                I hope you found this usefull.
+                
+                Thanks
+                Gökalp Ergenekon
 */
